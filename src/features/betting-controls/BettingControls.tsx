@@ -30,30 +30,26 @@ export function BettingControls() {
             </div>
 
             {playerRoom.players[playerRoom.currentTurnPlayerIndex].type === PlayerType.Human && !playerRoom.roundEnded &&
-                <div className="row">
+                <div className="row align-items-center">
                     {
                         range(35).map((i) => {
                             const nextBet = bets.next().value
                             return (
-                                <div className="col-1 my-3" key={`betDiv${i}`}>
+                                <div className="col-2 col-md-1 my-3" key={`betDiv${i}`}>
                                     {nextBet !== undefined &&
                                         <button
                                             type="button"
                                             className={`btn btn-${nextBet.dieSide === DieSide.Joker ? 'warning' : 'primary'}`}
                                             onClick={() => dispatch(humanPlayerPlaceBet(nextBet))}
                                         >
-                                            {nextBet.quantity}
-                                            &nbsp;x&nbsp;
-                                            <i
-                                                className={`${dieSideToBootstrapIconClass(nextBet.dieSide)}`}
-                                            ></i>
+                                            {nextBet.quantity}&nbsp;x&nbsp;<i className={`${dieSideToBootstrapIconClass(nextBet.dieSide)}`}></i>
                                         </button>
                                     }
                                 </div>
                             )
                         })
                     }
-                    <div className="col-1 my-3">
+                    <div className="col-2 col-md-1 my-3">
                         <button
                             type="button"
                             className="btn btn-danger"

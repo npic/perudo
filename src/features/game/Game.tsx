@@ -16,7 +16,7 @@ export function Game() {
     return (
         <div>
             <div className="row my-5">
-                <div className="col">
+                <div className="col-10 col-md-11">
                     <h1>
                         {
                             isGameOver
@@ -27,7 +27,7 @@ export function Game() {
                         }
                     </h1>
                 </div>
-                <div className="col-1">
+                <div className="col-2 col-md-1">
                     <button type="button" className="btn btn-danger" onClick={() => dispatch(stopGame())}>Quit</button>
                 </div>
             </div>

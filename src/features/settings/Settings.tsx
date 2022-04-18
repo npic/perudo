@@ -71,7 +71,7 @@ export function Settings() {
                 (() => {
                     if (humanPlayers > 0) {
                         const result = range(humanPlayers).map((i) =>
-                            <div className="col-2" key={`humanPlayerNameDiv${i}`}>
+                            <div className="col-12 col-md-4 col-lg-2" key={`humanPlayerNameDiv${i}`}>
                                 <label
                                     className="form-label"
                                     htmlFor={`humanPlayerName${i}`}
@@ -88,7 +88,7 @@ export function Settings() {
                             </div>
                         )
                         return (
-                            <div className="row mb-5">
+                            <div className="row gy-4 gy-lg-0">
                                 {result}
                             </div>
                         )
@@ -96,7 +96,7 @@ export function Settings() {
                 })()
             }
 
-            <div className="row">
+            <div className="row mt-5">
                 <div className="col">
                     <label className="form-label">Computer Players</label>
                 </div>

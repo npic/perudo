@@ -25,7 +25,7 @@ export function DiceControls() {
                     {areDiceShown
                         ? playerRoom.players[playerRoom.currentTurnPlayerIndex].dice.map((die, i) =>
                             <i
-                                className={`text-danger mx-3 fs-1 ${dieSideToBootstrapIconClass(die.value)}`}
+                                className={`text-danger mx-2 mx-sm-3 fs-1 ${dieSideToBootstrapIconClass(die.value)}`}
                                 key={`die_${playerRoom.currentTurnPlayerIndex}_${i}`}
                             ></i>
                         )
