@@ -4,7 +4,7 @@ Play now! https://npic.github.io/perudo/
 
 Perudo is a dice game originated in South America. It is also known as "Dudo", "Cacho", "Pico", "Bluff", "Liar's Dice", etc.
 
-Basically, players roll their dice, keeping them concealed from other players, and then they make increasing bids on how many dice of a certain value all players have across the board until someone makes a call. Then everyone reveals their dice, and if the last bet was correct, the caller loses the round, otherwise, the one who made the last bet loses.
+Basically, players roll their dice, keeping them concealed from other players, and then they make increasing bids on how many dice of a certain value all players have across the board until someone makes a call. Then everyone reveals their dice, and if the last bid was correct, the caller loses the round, otherwise, the one who made the last bid loses.
 
 Please refer to this Wikipedia article to get the general sense of the game: https://en.wikipedia.org/wiki/Dudo
 
@@ -29,7 +29,3 @@ In short terms:
 * React
 * Redux + Redux-Toolkit
 * Bootstrap + Bootstrap-Icons
-
-## App icon attribution
-
-The app icon is part of Circle Icons pack by Nick Roach: https://www.iconfinder.com/iconsets/circle-icons-1

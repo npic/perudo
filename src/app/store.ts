@@ -1,8 +1,8 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
-import pageSwitcherReducer from '../features/page-switcher/pageSwitcherSlice'
-import settingsReducer from '../features/settings/settingsSlice'
-import gameReducer from '../features/game/gameSlice'
-import diceControlsReducer from '../features/dice-controls/diceControlsSlice'
+import pageSwitcherReducer from '../features/page-switcher/PageSwitcherSlice'
+import settingsReducer from '../features/settings/SettingsSlice'
+import gameReducer from '../features/game/GameSlice'
+import diceControlsReducer from '../features/dice-controls/DiceControlsSlice'
 
 export const store = configureStore({
   reducer: {

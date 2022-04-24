@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store'
-import { range } from '../../app/util'
 
 export interface SettingsState {
     humanPlayers: number,
@@ -8,15 +7,17 @@ export interface SettingsState {
     aiPlayers: number,
     aiRiskLowerBound: number,
     aiRiskUpperBound: number,
+    aiTopBidsSimilarityThreshold: number,
     aiDelay: number,
 }
 
 const initialState: SettingsState = {
     humanPlayers: 1,
-    humanPlayerNames: range(6).map((i) => 'Player ' + String(i + 1)),
+    humanPlayerNames: ['Nikita', 'Best Friend', 'Mobber', 'Hater', 'Skater', 'Sugarboy'],
     aiPlayers: 5,
     aiRiskLowerBound: 20,
     aiRiskUpperBound: 60,
+    aiTopBidsSimilarityThreshold: 10,
     aiDelay: 1000,
 }
 
@@ -44,19 +45,32 @@ export const settingsSlice = createSlice({
         setAIRiskUpperBound: (state, action: PayloadAction<number>) => {
             state.aiRiskUpperBound = action.payload
         },
+        setAITopBidsSimilarityThreshold: (state, action: PayloadAction<number>) => {
+            state.aiTopBidsSimilarityThreshold = action.payload
+        },
         setAIDelay: (state, action: PayloadAction<number>) => {
             state.aiDelay = action.payload
         },
     }
 })
 
-export const { setHumanPlayers, setHumanPlayerName, setAIPlayers, setAIRiskLowerBound, setAIRiskUpperBound, setAIDelay } = settingsSlice.actions
+export const {
+    setHumanPlayers,
+    setHumanPlayerName,
+    setAIPlayers,
+    setAIRiskLowerBound,
+    setAIRiskUpperBound,
+    setAITopBidsSimilarityThreshold,
+    setAIDelay
+} = settingsSlice.actions
+
 export const selectAllSettings = (state: RootState) => state.settings
 export const selectHumanPlayers = (state: RootState) => state.settings.humanPlayers
 export const selectHumanPlayerNames = (state: RootState) => state.settings.humanPlayerNames
 export const selectAIPlayers = (state: RootState) => state.settings.aiPlayers
 export const selectAIRiskLowerBound = (state: RootState) => state.settings.aiRiskLowerBound
 export const selectAIRiskUpperBound = (state: RootState) => state.settings.aiRiskUpperBound
+export const selectAITopBidsSimilarityThreshold = (state: RootState) => state.settings.aiTopBidsSimilarityThreshold
 export const selectAIDelay = (state: RootState) => state.settings.aiDelay
 
 export default settingsSlice.reducer

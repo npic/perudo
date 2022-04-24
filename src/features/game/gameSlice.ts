@@ -1,22 +1,28 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { AppThunk, RootState } from "../../app/store"
-import { checkBet, placeBet, startNextRound as startNextRoundAction, startGame, stopGame } from '../../app/actions'
-import { range } from "../../app/util"
-import { isPlayerAlive, PlayerType } from "../../app/player/Player"
-import { endRound, getLoserIndex, getTotalDiceCount, getTotalPoints, isGameOver, makePlayerRoom, PlayerRoom, startNextRound, startNextTurn } from "../../app/player/PlayerRoom"
-import PlayerRoomBuilderDirector, { BasicPlayerInfo } from "../../app/player/PlayerRoomBuilder"
-import { Bet, betGenerator, calculateBetProbability } from "../../app/bet/Bet"
-import { SettingsState } from "../settings/settingsSlice"
-import { addEvent, createNewLog, GameEventType, GameLog } from "../../app/log/Log"
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { AppThunk, RootState } from '../../app/store'
+import { startGame, stopGame, placeBid, checkBid, startNextRound } from '../../app/actions'
+
+import GameRoomBuilderDirector from '../../core/room/GameRoomBuilder'
+import GameRoom from '../../core/room/GameRoom'
+import * as GameRoomUtils from '../../core/room/GameRoomUtils'
+
+import GameLog from '../../core/log/GameLog'
+import * as GameLogUtils from '../../core/log/GameLogUtils'
+
+import Bid from '../../core/bid/Bid'
+
+import * as AIUtils from '../../core/player/AIUtils'
+
+import { SettingsState } from '../settings/SettingsSlice'
 
 export interface GameSliceState {
-    room: PlayerRoom,
+    room: GameRoom,
     log: GameLog,
 }
 
 const initialState: GameSliceState = {
-    room: makePlayerRoom(),
-    log: createNewLog(),
+    room: GameRoomUtils.makeGameRoom(),
+    log: GameLogUtils.makeGameLog(),
 }
 
 export const gameSlice = createSlice({
@@ -26,102 +32,34 @@ export const gameSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(startGame, (state, action: PayloadAction<SettingsState>) => {
-                const roomBuilderDirector = new PlayerRoomBuilderDirector()
-                const humanPlayers: BasicPlayerInfo[] =
-                    range(action.payload.humanPlayers)
-                        .map((i) => ({
-                            playerName: action.payload.humanPlayerNames[i],
-                            playerType: PlayerType.Human,
-                            aiPlayerRiskLowerBound: 0,
-                            aiPlayerRiskUpperBound: 0,
-                            aiDelay: 0,
-                        }))
-                const aiPlayers: BasicPlayerInfo[] =
-                    range(action.payload.aiPlayers)
-                        .map(() => ({
-                            playerName: '',
-                            playerType: PlayerType.AI,
-                            aiPlayerRiskLowerBound: action.payload.aiRiskLowerBound,
-                            aiPlayerRiskUpperBound: action.payload.aiRiskUpperBound,
-                            aiDelay: action.payload.aiDelay,
-                        }))
-                const allPlayers: BasicPlayerInfo[] = humanPlayers.concat(aiPlayers)
-                state.room = roomBuilderDirector.buildPlayerRoom(allPlayers)
-                state.log = createNewLog()
-                addEvent(state.log, {
-                    type: GameEventType.GameStart,
-                    playerNames: state.room.players.map((player) => player.name)
-                })
-                startNextRound(state.room)
-                addEvent(state.log, {
-                    type: GameEventType.RoundStart,
-                    roundNumber: state.room.currentRoundNumber,
-                    isMaputo: state.room.isMaputoRound,
-                })
+                const roomBuilderDirector = new GameRoomBuilderDirector()
+                state.room = roomBuilderDirector.buildPlayerRoom(action.payload)
+                state.log = GameLogUtils.makeGameLog()
+                if (state.room.players.length > 1) {
+                    GameRoomUtils.startNextRound(state.room)
+                    GameLogUtils.logGameStart(state.log, state.room)
+                } else {
+                    GameRoomUtils.endRound(state.room)
+                }
             })
             .addCase(stopGame, (state) => {
-                endRound(state.room)
+                GameRoomUtils.endRound(state.room)
             })
-            .addCase(placeBet, (state, action: PayloadAction<Bet>) => {
-                addEvent(state.log, {
-                    type: GameEventType.Bet,
-                    playerName: state.room.players[state.room.currentTurnPlayerIndex].name,
-                    betQuantity: action.payload.quantity,
-                    betDieSide: action.payload.dieSide,
-                })
-                startNextTurn(state.room, action.payload)
+            .addCase(placeBid, (state, action: PayloadAction<Bid>) => {
+                GameRoomUtils.startNextTurn(state.room, action.payload)
+                GameLogUtils.logBid(state.log, state.room)
             })
-            .addCase(checkBet, (state) => {
-                addEvent(state.log, {
-                    type: GameEventType.Check,
-                    playerName: state.room.players[state.room.currentTurnPlayerIndex].name,
-                })
-                addEvent(state.log, {
-                    type: GameEventType.RevealAllDice,
-                    playerDice:
-                        state.room.players
-                            .filter((player) => isPlayerAlive(player))
-                            .map((player) => ({
-                                playerName: player.name,
-                                dice: player.dice.map((die) => die.value)
-                            })),
-                })
-
-                endRound(state.room)
-                
-                const loserIndex = getLoserIndex(state.room)
-                addEvent(state.log, {
-                    type: GameEventType.RoundOutcome,
-                    loserName: state.room.players[loserIndex].name,
-                })
-                if (state.room.players[loserIndex].diceOwned <= 1) {
-                    addEvent(state.log, {
-                        type: GameEventType.PlayerLost,
-                        loserName: state.room.players[loserIndex].name,
-                    })
-                }
-                addEvent(state.log, {
-                    type: GameEventType.RoundEnd,
-                    roundNumber: state.room.currentRoundNumber,
-                })
+            .addCase(checkBid, (state) => {
+                GameRoomUtils.endRound(state.room)
+                GameLogUtils.logCheck(state.log, state.room)
             })
-            .addCase(startNextRoundAction, (state) => {
-                startNextRound(state.room)
-                if (isGameOver(state.room)) {
-                    state.room.roundEnded = true
-                    addEvent(state.log, {
-                        type: GameEventType.PlayerWon,
-                        winnerName: state.room.players[state.room.currentTurnPlayerIndex].name,
-                    })
-                    addEvent(state.log, {
-                        type: GameEventType.GameEnd,
-                    })
+            .addCase(startNextRound, (state) => {
+                GameRoomUtils.startNextRound(state.room)
+                if (GameRoomUtils.isGameOver(state.room)) {
+                    GameRoomUtils.endRound(state.room)
+                    GameLogUtils.logGameOver(state.log, state.room)
                 } else {
-                    addEvent(state.log, {
-                        type: GameEventType.RoundStart,
-                        roundNumber: state.room.currentRoundNumber,
-                        isMaputo: state.room.isMaputoRound,
-                    })
+                    GameLogUtils.logRoundStart(state.log, state.room)
                 }
             })
     }
@@ -129,44 +67,40 @@ export const gameSlice = createSlice({
 
 export const selectRoom = (state: RootState) => state.game.room
 export const selectLog = (state: RootState) => state.game.log
-export const selectIsGameOver = (state: RootState) => isGameOver(state.game.room)
-export const selectTotalPoints = (state: RootState) => getTotalPoints(state.game.room)
-export const selectLoserIndex = (state: RootState) => getLoserIndex(state.game.room)
+export const selectCurrentPlayer = (state: RootState) => state.game.room.players[state.game.room.currentTurnPlayerIndex]
+export const selectCurrentBid = (state: RootState) => state.game.room.currentBid
+export const selectRoundNumber = (state: RootState) => state.game.room.currentRoundNumber
+export const selectIsMaputoRound = (state: RootState) => state.game.room.isMaputoRound
+export const selectIsHumanTurn = (state: RootState) => GameRoomUtils.isHumanTurn(state.game.room)
+export const selectIsAITurn = (state: RootState) => GameRoomUtils.isAITurn(state.game.room)
+export const selectIsRoundEnded = (state: RootState) => state.game.room.roundEnded
+export const selectIsGameOver = (state: RootState) => GameRoomUtils.isGameOver(state.game.room)
+export const selectIsRoomEmpty = (state: RootState) => state.game.room.players.length <= 1
+export const selectTotalDiceCount = (state: RootState) => GameRoomUtils.getTotalDiceCount(state.game.room)
+export const selectTotalPoints = (state: RootState) => GameRoomUtils.getTotalPoints(state.game.room)
+export const selectLoser = (state: RootState) => state.game.room.players[GameRoomUtils.getLoserIndex(state.game.room)]
 
-export function makeAIMove(room: PlayerRoom) {
-    const bets = betGenerator(room.currentBet, getTotalDiceCount(room), room.isMaputoRound)
-    const currentPlayer = room.players[room.currentTurnPlayerIndex]
-    let candidates = []
-    for (let i = 0; i < 35; i++) {
-        let bet = bets.next().value
-        if (bet) {
-            candidates.push({
-                bet: bet,
-                probability: 100 * calculateBetProbability(bet, currentPlayer.dice, getTotalDiceCount(room), !room.isMaputoRound),
-            })
-        } else {
-            break
-        }
+const interactionInvokingAIAction = (action: any, dispatchedByHuman: boolean): AppThunk => (dispatch, getState) => {
+    let state = getState()
+    const isRoundEndedBeforeAction = selectIsRoundEnded(state)
+
+    if (dispatchedByHuman || !isRoundEndedBeforeAction) {
+        dispatch(action)
     }
-    candidates = candidates
-        .filter((candidate) => candidate.probability >= currentPlayer.aiRiskCurrentValue)
-        .sort((candidateA, candidateB) => candidateB.probability - candidateA.probability)
-    if (candidates.length === 0) {
-        return checkBet()
-    } else {
-        return placeBet(candidates[0].bet)
+    
+    state = getState()
+    const isRoundEnded = selectIsRoundEnded(state)
+    const room = selectRoom(state)
+    const currentPlayer = selectCurrentPlayer(state)
+    const isAITurn = selectIsAITurn(state)
+
+    if (isAITurn && !isRoundEnded) {
+        const aiDecision = interactionInvokingAIAction(AIUtils.makeAIMove(room), false)
+        setTimeout(() => dispatch(aiDecision), currentPlayer.aiDelay)
     }
 }
-
-const playerInteractionInvokingAIAction = (action: any): AppThunk => (dispatch, getState) => {
-    dispatch(action)
-    const room = selectRoom(getState())
-    if (room.players[room.currentTurnPlayerIndex].type === PlayerType.AI && !room.roundEnded) {
-        setTimeout(() => dispatch(playerInteractionInvokingAIAction(makeAIMove(room))), room.players[room.currentTurnPlayerIndex].aiDelay)
-    }
-}
-export const humanPlayerStartGame = (settings: SettingsState): AppThunk => playerInteractionInvokingAIAction(startGame(settings))
-export const humanPlayerPlaceBet = (bet: Bet): AppThunk => playerInteractionInvokingAIAction(placeBet(bet))
-export const humanPlayerStartNextRound = (): AppThunk => playerInteractionInvokingAIAction(startNextRoundAction())
+export const humanPlayerStartGame = (settings: SettingsState): AppThunk => interactionInvokingAIAction(startGame(settings), true)
+export const humanPlayerPlaceBid = (bid: Bid): AppThunk => interactionInvokingAIAction(placeBid(bid), true)
+export const humanPlayerStartNextRound = (): AppThunk => interactionInvokingAIAction(startNextRound(), true)
 
 export default gameSlice.reducer

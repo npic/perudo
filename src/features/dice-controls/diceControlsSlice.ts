@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { checkBet, placeBet, startGame } from '../../app/actions'
 import { RootState } from '../../app/store'
+import { checkBid, placeBid, startGame } from '../../app/actions'
 
 export interface DiceControlsState {
     areDiceShown: boolean,
@@ -23,10 +23,10 @@ export const diceControlsSlice = createSlice({
             .addCase(startGame, (state) => {
                 state.areDiceShown = initialState.areDiceShown
             })
-            .addCase(placeBet, (state) => {
+            .addCase(placeBid, (state) => {
                 state.areDiceShown = false
             })
-            .addCase(checkBet, (state) => {
+            .addCase(checkBid, (state) => {
                 state.areDiceShown = false
             })
     },

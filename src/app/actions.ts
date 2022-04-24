@@ -1,10 +1,10 @@
 import { createAction } from '@reduxjs/toolkit'
-import { Bet } from './bet/Bet'
-import { SettingsState } from '../features/settings/settingsSlice'
+import Bid from '../core/bid/Bid'
+import { SettingsState } from '../features/settings/SettingsSlice'
 
 export const startGame = createAction<SettingsState>('startGame')
 export const stopGame = createAction('stopGame')
 
 export const startNextRound = createAction('startNextRound')
-export const placeBet = createAction<Bet>('placeBet')
-export const checkBet = createAction('checkBet')
+export const placeBid = createAction<Bid>('placeBid')
+export const checkBid = createAction('checkBid')
