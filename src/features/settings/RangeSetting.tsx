@@ -25,7 +25,7 @@ export function RangeSetting({ id, label, min, minLabel, max, maxLabel, step, va
             </div>
             <div className="row">
                 <div className="col-2 text-end">{minLabel || min}</div>
-                <div className="col-4">
+                <div className="col-6 col-md-4">
                     <input
                         type="range"
                         className="form-range"
