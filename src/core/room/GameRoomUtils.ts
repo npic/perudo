@@ -3,7 +3,7 @@ import GameRoom from './GameRoom'
 import PlayerType from '../player/PlayerType'
 import Bid from '../bid/Bid'
 import * as BidUtils from '../bid/BidUtils'
-import * as DieUtils from '../dice/DieUtils'
+import * as DiceSetUtils from '../dice/DiceSetUtils'
 import * as PlayerUtils from '../player/PlayerUtils'
 
 export function makeGameRoom(): GameRoom {
@@ -54,7 +54,7 @@ export function getTotalDiceCount(room: GameRoom) {
 
 export function getTotalPoints(room: GameRoom) {
     return room.players
-        .map((player) => DieUtils.countPoints(player.dice, room.currentBid.dieFace))
+        .map((player) => DiceSetUtils.countPoints(player.dice, room.currentBid.dieFace))
         .reduce(sum, 0)
 }
 

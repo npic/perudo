@@ -1,11 +1,11 @@
 import PlayerType from './PlayerType'
-import Die from '../dice/Die'
+import DiceSet from '../dice/DiceSet'
 
 export default interface Player {
     name: string
     type: PlayerType
     diceOwned: number
-    dice: Die[]
+    dice: DiceSet
     hadMaputoRound: boolean
     aiRiskLowerBound: number
     aiRiskUpperBound: number

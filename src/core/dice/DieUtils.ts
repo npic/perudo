@@ -1,9 +1,9 @@
-import { range, randomPick, sum } from '../util'
+import { randomPick } from '../util'
 import Die from './Die'
 import DieFace from './face/DieFace'
 import * as DieFaceUtils from './face/DieFaceUtils'
 
-export const MAX_FACES = 6
+export const DIE_FACES = 6
 
 export function makeDie(withJoker: boolean) {
     let newDie: Die = {
@@ -21,12 +21,6 @@ export function makeDie(withJoker: boolean) {
     return newDie
 }
 
-export function makeDiceSet(size: number, withJokers: boolean) {
-    return range(size)
-        .map(() => makeDie(withJokers))
-        .sort(compare)
-}
-
 export function roll(die: Die) {
     die.value = randomPick(die.faces) as DieFace
 }
@@ -41,10 +35,4 @@ export function compare(dieA: Die, dieB: Die) {
 
 export function matches(die: Die, matchWith: DieFace) {
     return die.value === DieFace.Joker || die.value === matchWith
-}
-
-export function countPoints(diceSet: Die[], matchWith: DieFace) {
-    return diceSet
-        .map((die) => Number(matches(die, matchWith) ? 1 : 0))
-        .reduce(sum, 0)
 }
