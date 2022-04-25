@@ -7,21 +7,13 @@ export function product(accumulator: bigint, currentValue: bigint) {
 }
 
 function normalizeBoundaries(startOrEnd: number, end: number | undefined): [number, number] {
-    if (end === undefined) {
-        return [0, startOrEnd]
-    } else {
-        if (end >= startOrEnd) {
-            return [startOrEnd, end]
-        } else {
-            return [end, startOrEnd]
-        }
-    }
+    return end === undefined ? [0, startOrEnd] : [startOrEnd, end]
 }
 
 export function range(end: number): number[]
 export function range(start: number, end: number): number[]
 export function range(startOrEnd: number, end?: number): number[] {
-    let [rangeStart, rangeEnd] = normalizeBoundaries(startOrEnd, end)
+    const [rangeStart, rangeEnd] = normalizeBoundaries(startOrEnd, end)
     let result = []
     for (let i = rangeStart; i < rangeEnd; i++) {
         result.push(i)
@@ -32,7 +24,7 @@ export function range(startOrEnd: number, end?: number): number[] {
 export function randomNumber(upperBound: number): number
 export function randomNumber(lowerBound: number, upperBound: number): number
 export function randomNumber(lowerOrUpperBound: number, upperBound?: number): number {
-    let [rangeStart, rangeEnd] = normalizeBoundaries(lowerOrUpperBound, upperBound)
+    const [rangeStart, rangeEnd] = normalizeBoundaries(lowerOrUpperBound, upperBound)
     return rangeStart + Math.floor(Math.random() * (rangeEnd - rangeStart))
 }
 
