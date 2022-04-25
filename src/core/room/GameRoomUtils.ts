@@ -91,7 +91,7 @@ export function startNextRound(room: GameRoom) {
         const onlyTwoPlayersAliveException = numberOfAlivePlayers === 2
         const onlyThreePlayersWithOneDieEachAliveException =
             numberOfAlivePlayers === 3
-            && room.players.every((player) => player.diceOwned === 1)
+            && room.players.every((player) => player.diceOwned === 1 || !PlayerUtils.isAlive(player))
         room.isMaputoRound =
             maputoBaseConditions
             && !onlyTwoPlayersAliveException
