@@ -24,8 +24,8 @@ export function RangeSetting({ id, label, min, minLabel, max, maxLabel, step, va
                 </div>
             </div>
             <div className="row">
-                <div className="col-auto text-end text-nowrap">{minLabel || min}</div>
-                <div className="col col-md-4">
+                <div className="col-2 text-end">{minLabel || min}</div>
+                <div className="col-4">
                     <input
                         type="range"
                         className="form-range"
@@ -37,7 +37,7 @@ export function RangeSetting({ id, label, min, minLabel, max, maxLabel, step, va
                         onChange={(e) => dispatch(onChangeAction(Number(e.target.value)))}
                     ></input>
                 </div>
-                <div className="col-auto text-start text-nowrap">{maxLabel || max}</div>
+                <div className="col-2 text-start">{maxLabel || max}</div>
             </div>
         </div>
     )
