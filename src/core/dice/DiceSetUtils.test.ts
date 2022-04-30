@@ -1,18 +1,17 @@
-import DieFace from './face/DieFace'
-import * as DiceSetUtils from './DiceSetUtils'
-import * as DieFaceUtils from './face/DieFaceUtils'
+import { DieFace } from 'core/types'
+import { DieUtils, DiceSetUtils } from 'core/utils'
 
 test('Test makeDiceSet', () => {
-    let testDiceSet = DiceSetUtils.makeDiceSet(5, true)
+    const testDiceSet = DiceSetUtils.makeDiceSet(5, true)
     expect(testDiceSet.length).toBe(5);
     [0, 1, 2, 3].forEach((i) => {
-        expect(DieFaceUtils.toNumber(testDiceSet[i].value))
-            .toBeLessThanOrEqual(DieFaceUtils.toNumber(testDiceSet[i + 1].value))
+        expect(DieUtils.toNumber(testDiceSet[i]))
+            .toBeLessThanOrEqual(DieUtils.toNumber(testDiceSet[i + 1]))
     })
 })
 
 test('Test DiceSet countPoints', () => {
-    let testDiceSet = DiceSetUtils.makeDiceSet(5, true)
+    const testDiceSet = DiceSetUtils.makeDiceSet(5, true)
     testDiceSet[0].value = DieFace.Joker
     testDiceSet[1].value = DieFace.Joker
     testDiceSet[2].value = DieFace.Three

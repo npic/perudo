@@ -1,5 +1,4 @@
-import PlayerType from './PlayerType'
-import DiceSet from '../dice/DiceSet'
+import { PlayerType, DiceSet } from 'core/types'
 
 export default interface Player {
     name: string

@@ -1,5 +1,4 @@
-import Player from '../player/Player'
-import Bid from '../bid/Bid'
+import { Player, Bid } from 'core/types'
 
 export default interface GameRoom {
     players: Player[]

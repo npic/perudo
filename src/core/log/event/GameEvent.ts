@@ -1,5 +1,4 @@
-import GameEventType from './GameEventType'
-import DieFace from '../../dice/face/DieFace'
+import { GameEventType, DieFace } from 'core/types'
 
 interface GameStartEvent {
     type: GameEventType.GameStart
@@ -27,6 +26,7 @@ interface CheckEvent {
 interface RevealAllDiceEvent {
     type: GameEventType.RevealAllDice
     roundNumber: number
+    matchingDieFace: DieFace
     playerDice: { playerName: string, dice: DieFace[] }[]
 }
 

@@ -1,4 +1,4 @@
-import DieFace from '../dice/face/DieFace'
+import { DieFace } from 'core/types'
 
 export default interface Bid {
     quantity: number

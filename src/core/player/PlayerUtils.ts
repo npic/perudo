@@ -1,6 +1,5 @@
-import Player from './Player'
-import PlayerBasicProperties from './PlayerBasicProperties'
-import * as DiceSetUtils from '../dice/DiceSetUtils'
+import { Player, PlayerBasicProperties } from 'core/types'
+import { DiceSetUtils } from 'core/utils'
 
 export function makePlayer({ name, type, aiRiskLowerBound = 0, aiRiskUpperBound = 0, aiTopBidsSimilarityThreshold = 0, aiDelay = 0 }: PlayerBasicProperties): Player {
     return {

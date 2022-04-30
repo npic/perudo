@@ -1,8 +1,5 @@
-import { range } from '../util'
-import Bid from './Bid'
-import DieFace from '../dice/face/DieFace'
-import * as DieUtils from '../dice/DieUtils'
-import * as DieFaceUtils from '../dice/face/DieFaceUtils'
+import { Bid, DieFace } from 'core/types'
+import { DieUtils, range } from 'core/utils'
 
 export function makeBid(quantity: number, dieFace: DieFace): Bid {
     return {
@@ -20,14 +17,20 @@ export function isNullBid(bid: Bid) {
 }
 
 export function toNumber(bid: Bid): number {
-    return (bid.dieFace === DieFace.Joker ? bid.quantity * 2 + 1 : bid.quantity) * 10 + DieFaceUtils.toNumber(bid.dieFace)
+    return (bid.dieFace === DieFace.Joker ? bid.quantity * 2 + 1 : bid.quantity) * 10 + DieUtils.toNumber(bid.dieFace)
 }
 
 export function compare(bidA: Bid, bidB: Bid) {
     return toNumber(bidA) - toNumber(bidB)
 }
 
-export function* nextBidsGenerator({ startingBid, maxQuantity, isMaputoRound }: { startingBid: Bid, maxQuantity: number, isMaputoRound: boolean }) {
+interface MakeAvailableBidsArguments {
+    startingBid: Bid
+    numberOfBids: number
+    maxBidQuantity: number
+    isMaputoRound: boolean
+}
+export function makeAvailableBids({ startingBid, numberOfBids, maxBidQuantity, isMaputoRound }: MakeAvailableBidsArguments) {
     const facesGenerator = function*(withJokers: boolean) {
         while (true) {
             yield (withJokers ? DieFace.Joker : DieFace.One)
@@ -39,20 +42,20 @@ export function* nextBidsGenerator({ startingBid, maxQuantity, isMaputoRound }: 
         }
     }
     const faces = facesGenerator(!isMaputoRound)
-    const allPossibleBids: Bid[] =
-        range(maxQuantity * DieUtils.DIE_FACES)
+    const isFirstTurn = isNullBid(startingBid)
+    const availableBids: Bid[] =
+        range(maxBidQuantity * DieUtils.DIE_FACES)
             .map((i) => makeBid(Math.floor(i / DieUtils.DIE_FACES) + 1, faces.next().value))
             .filter((bid) => {
                 const increasingBidsRule = compare(bid, startingBid) > 0
-                const firstBidIsNotAJokerRule = isNullBid(startingBid) ? bid.dieFace !== DieFace.Joker : true
-                const maputoRule = isMaputoRound && !isNullBid(startingBid) ? bid.dieFace === startingBid.dieFace : true
+                const firstBidIsNotAJokerRule = isFirstTurn ? bid.dieFace !== DieFace.Joker : true
+                const maputoRule = isMaputoRound && !isFirstTurn ? bid.dieFace === startingBid.dieFace : true
                 
                 return increasingBidsRule
                     && firstBidIsNotAJokerRule
                     && maputoRule
             })
             .sort(compare)
-    for (let bid of allPossibleBids) {
-        yield bid
-    }
+    availableBids.splice(numberOfBids)
+    return availableBids
 }

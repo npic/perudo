@@ -1,4 +1,4 @@
-import PlayerType from './PlayerType'
+import { PlayerType } from 'core/types'
 
 export default interface PlayerBasicProperties {
     name: string

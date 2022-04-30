@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { RootState } from '../../app/store'
-import { startGame, stopGame } from '../../app/actions'
+import { RootState } from 'app/store'
+import { GameSlice } from 'app/slices'
 
 export enum AppPage {
     MainMenu = 'Main Menu',
@@ -15,21 +15,20 @@ const initialState: PageSwitcherState = {
     currentPage: AppPage.MainMenu,
 }
 
-export const pageSwitcherSlice = createSlice({
+const slice = createSlice({
     name: 'pageSwitcher',
     initialState,
     reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(startGame, (state) => {
+            .addCase(GameSlice.startGame, (state) => {
                 state.currentPage = AppPage.Game
             })
-            .addCase(stopGame, (state) => {
+            .addCase(GameSlice.stopGame, (state) => {
                 state.currentPage = AppPage.MainMenu
             })
     }
 })
 
+export const reducer = slice.reducer
 export const selectCurrentPage = (state: RootState) => state.pageSwitcher.currentPage
-
-export default pageSwitcherSlice.reducer

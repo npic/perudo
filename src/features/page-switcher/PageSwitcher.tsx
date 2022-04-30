@@ -1,15 +1,15 @@
-import { useAppSelector } from '../../app/hooks'
-import { AppPage, selectCurrentPage } from './PageSwitcherSlice'
+import { useAppSelector } from 'app/hooks'
+import { PageSwitcherSlice } from 'app/slices'
 
-import { MainMenu } from '../main-menu/MainMenu'
-import { GamePage } from '../game/GamePage'
+import MainMenu from 'features/app-pages/main-menu/MainMenu'
+import GamePage from 'features/app-pages/game-page/GamePage'
 
-export function PageSwitcher() {
-    const currentPage = useAppSelector(selectCurrentPage)
+export default function PageSwitcher() {
+    const currentPage = useAppSelector(PageSwitcherSlice.selectCurrentPage)
     switch (currentPage) {
-        case AppPage.MainMenu:
+        case PageSwitcherSlice.AppPage.MainMenu:
             return <MainMenu />
-        case AppPage.Game:
+        case PageSwitcherSlice.AppPage.Game:
             return <GamePage />
     }
 }

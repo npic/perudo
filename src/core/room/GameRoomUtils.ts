@@ -1,10 +1,5 @@
-import { randomNumber, roundRobin, sum } from '../util'
-import GameRoom from './GameRoom'
-import PlayerType from '../player/PlayerType'
-import Bid from '../bid/Bid'
-import * as BidUtils from '../bid/BidUtils'
-import * as DiceSetUtils from '../dice/DiceSetUtils'
-import * as PlayerUtils from '../player/PlayerUtils'
+import { GameRoom, PlayerType, Bid } from 'core/types'
+import { BidUtils, DiceSetUtils, PlayerUtils, randomNumber, roundRobin, sum } from 'core/utils'
 
 export function makeGameRoom(): GameRoom {
     return {
@@ -31,7 +26,7 @@ export function prepareAIPlayers(room: GameRoom) {
 }
 
 export function isGameOver(room: GameRoom) {
-    let alivePlayers =
+    const alivePlayers =
         room.players
             .map((player) => PlayerUtils.isAlive(player) ? 1 : 0)
             .reduce(sum, 0)
@@ -79,7 +74,7 @@ export function startNextRound(room: GameRoom) {
     } else {
         // 1. Punish the loser
         room.currentTurnPlayerIndex = getLoserIndex(room)
-        let loser = room.players[room.currentTurnPlayerIndex]
+        const loser = room.players[room.currentTurnPlayerIndex]
         loser.diceOwned--
 
         // 2. Determine if the next round will be a Maputo round

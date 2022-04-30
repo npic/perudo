@@ -1,11 +1,5 @@
-import { PageSwitcher } from '../features/page-switcher/PageSwitcher'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-icons/font/bootstrap-icons.css'
+import PageSwitcher from 'features/page-switcher/PageSwitcher'
 
 export default function App() {
-    return (
-        <div className="container">
-            <PageSwitcher />
-        </div>
-    );
+    return <PageSwitcher />
 }

@@ -1,4 +1,4 @@
-import Die from './Die'
+import { Die } from 'core/types'
 
 type DiceSet = Die[]
 

@@ -1,4 +1,4 @@
-import GameEvent from './event/GameEvent'
+import { GameEvent } from 'core/types'
 
 type GameLog = GameEvent[]
 

@@ -1,9 +1,5 @@
-import GameLog from './GameLog'
-import GameEvent from './event/GameEvent'
-import GameEventType from './event/GameEventType'
-import GameRoom from '../room/GameRoom'
-import * as GameRoomUtils from '../room/GameRoomUtils'
-import * as PlayerUtils from '../player/PlayerUtils'
+import { GameLog, GameEvent, GameEventType, GameRoom } from 'core/types'
+import { GameRoomUtils, PlayerUtils } from 'core/utils'
 
 export function makeGameLog(): GameLog {
     return []
@@ -46,6 +42,7 @@ export function logCheck(log: GameLog, room: GameRoom) {
     addEvent(log, {
         type: GameEventType.RevealAllDice,
         roundNumber: room.currentRoundNumber,
+        matchingDieFace: room.currentBid.dieFace,
         playerDice:
             room.players
                 .filter((player) => PlayerUtils.isAlive(player))

@@ -1,7 +1,5 @@
-import { range, sum } from '../util'
-import DiceSet from './DiceSet'
-import DieFace from './face/DieFace'
-import * as DieUtils from './DieUtils'
+import { DiceSet, DieFace } from 'core/types'
+import { DieUtils, range, sum } from 'core/utils'
 
 export const STARTING_DICE_NUMBER = 5
 

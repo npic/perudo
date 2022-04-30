@@ -1,13 +1,6 @@
-import { range, shuffle } from '../util'
-
-import GameRoom from './GameRoom'
-import * as GameRoomUtils from './GameRoomUtils'
-
-import PlayerType from '../player/PlayerType'
-import PlayerBasicProperties from '../player/PlayerBasicProperties'
-import * as PlayerUtils from '../player/PlayerUtils'
-
-import { SettingsState } from '../../features/settings/SettingsSlice'
+import { SettingsSlice } from 'app/slices'
+import { GameRoom, PlayerType, PlayerBasicProperties } from 'core/types'
+import { GameRoomUtils, PlayerUtils, range, shuffle } from 'core/utils'
 
 function* playerNameGenerator() {
     const playerNames = shuffle([
@@ -30,7 +23,7 @@ function* playerNameGenerator() {
         'Zlatko Slatko',
         'Slavko Mravko',
     ])
-    for (let playerName of playerNames) {
+    for (const playerName of playerNames) {
         yield playerName
     }
 }
@@ -45,7 +38,7 @@ class GameRoomBuilder {
     }
 
     addPlayer(playerInfo: PlayerBasicProperties) {
-        let finalName = playerInfo.name || this.playerNames.next().value
+        const finalName = playerInfo.name || this.playerNames.next().value
         this.gameRoom.players.push(PlayerUtils.makePlayer({ ...playerInfo, name: finalName }))
     }
 
@@ -65,7 +58,7 @@ export default class GameRoomBuilderDirector {
         this.builder = new GameRoomBuilder()
     }
 
-    buildPlayerRoom(gameSettings: SettingsState) {
+    buildPlayerRoom(gameSettings: SettingsSlice.SettingsState) {
         this.builder = new GameRoomBuilder()
         
         range(gameSettings.humanPlayers)

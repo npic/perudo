@@ -1,5 +1,5 @@
-import DieFace from '../dice/face/DieFace'
-import * as BidUtils from './BidUtils'
+import { DieFace } from 'core/types'
+import { BidUtils, DieUtils } from 'core/utils'
 
 test('Test makeBid, makeNullBid, isNullBid', () => {
     const testBid = BidUtils.makeBid(11, DieFace.Six)
@@ -37,53 +37,56 @@ test('Test Bid compare', () => {
     })
 })
 
-describe('Test nextBidsGenerator', () => {
+describe('Test makeAvailableBids', () => {
+    const testMaxBidQuantity = 3
+    const testMaxNumberOfBids = testMaxBidQuantity * DieUtils.DIE_FACES
+    
     test('Normal round, first turn', () => {
         const currentBid = BidUtils.makeNullBid()
-        const testGenerator = BidUtils.nextBidsGenerator({ startingBid: currentBid, maxQuantity: 3, isMaputoRound: false })
-        let nextBid
-        let numberOfBids = 0
-        while (nextBid = testGenerator.next().value) {
-            numberOfBids++
-            expect(nextBid.dieFace).not.toEqual(DieFace.Joker)
-            expect(nextBid.dieFace).not.toEqual(DieFace.One)
-        }
-        expect(numberOfBids).toBe(15)
+        const availableBids = BidUtils.makeAvailableBids({
+            startingBid: currentBid,
+            numberOfBids: testMaxNumberOfBids,
+            maxBidQuantity: testMaxBidQuantity,
+            isMaputoRound: false,
+        })
+        expect(availableBids).not.toContain(expect.objectContaining({ dieFace: DieFace.Joker }))
+        expect(availableBids).not.toContain(expect.objectContaining({ dieFace: DieFace.One }))
+        expect(availableBids.length).toBe(15)
     })
 
     test('Normal round, second turn', () => {
         const currentBid = BidUtils.makeBid(1, DieFace.Two)
-        const testGenerator = BidUtils.nextBidsGenerator({ startingBid: currentBid, maxQuantity: 3, isMaputoRound: false })
-        let nextBid
-        let numberOfBids = 0
-        while (nextBid = testGenerator.next().value) {
-            numberOfBids++
-            expect(nextBid.dieFace).not.toEqual(DieFace.One)
-        }
-        expect(numberOfBids).toBe(17)
+        const availableBids = BidUtils.makeAvailableBids({
+            startingBid: currentBid,
+            numberOfBids: testMaxNumberOfBids,
+            maxBidQuantity: testMaxBidQuantity,
+            isMaputoRound: false,
+        })
+        expect(availableBids).not.toContain(expect.objectContaining({ dieFace: DieFace.One }))
+        expect(availableBids.length).toBe(17)
     })
 
     test('Maputo round, first turn', () => {
         const currentBid = BidUtils.makeNullBid()
-        const testGenerator = BidUtils.nextBidsGenerator({ startingBid: currentBid, maxQuantity: 3, isMaputoRound: true })
-        let nextBid
-        let numberOfBids = 0
-        while (nextBid = testGenerator.next().value) {
-            numberOfBids++
-            expect(nextBid.dieFace).not.toEqual(DieFace.Joker)
-        }
-        expect(numberOfBids).toBe(18)
+        const availableBids = BidUtils.makeAvailableBids({
+            startingBid: currentBid,
+            numberOfBids: testMaxNumberOfBids,
+            maxBidQuantity: testMaxBidQuantity,
+            isMaputoRound: true,
+        })
+        expect(availableBids).not.toContain(expect.objectContaining({ dieFace: DieFace.Joker }))
+        expect(availableBids.length).toBe(18)
     })
 
     test('Maputo round, second turn', () => {
         const currentBid = BidUtils.makeBid(1, DieFace.Two)
-        const testGenerator = BidUtils.nextBidsGenerator({ startingBid: currentBid, maxQuantity: 3, isMaputoRound: true })
-        let nextBid
-        let numberOfBids = 0
-        while (nextBid = testGenerator.next().value) {
-            numberOfBids++
-            expect(nextBid.dieFace).toEqual(DieFace.Two)
-        }
-        expect(numberOfBids).toBe(2)
+        const availableBids = BidUtils.makeAvailableBids({
+            startingBid: currentBid,
+            numberOfBids: testMaxNumberOfBids,
+            maxBidQuantity: testMaxBidQuantity,
+            isMaputoRound: true,
+        })
+        expect(availableBids.every((bid) => bid.dieFace === DieFace.Two)).toBe(true)
+        expect(availableBids.length).toBe(2)
     })
 })

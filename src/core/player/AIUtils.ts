@@ -1,47 +1,58 @@
-import { placeBid, checkBid } from '../../app/actions'
-import { range, randomPick, sum, product } from '../util'
-import Bid from '../bid/Bid'
-import DiceSet from '../dice/DiceSet'
-import DieFace from '../dice/face/DieFace'
-import GameRoom from '../room/GameRoom'
-import * as BidUtils from '../bid/BidUtils'
-import * as DieUtils from '../dice/DieUtils'
-import * as GameRoomUtils from '../room/GameRoomUtils'
+import { AppThunk } from 'app/store'
+import { GameSlice } from 'app/slices'
+import { Bid, DiceSet, DieFace, GameRoom } from 'core/types'
+import { BidUtils, DieUtils, GameRoomUtils, range, randomPick, sum, product } from 'core/utils'
 
 export function makeAIMove(room: GameRoom) {
     const totalDiceCount = GameRoomUtils.getTotalDiceCount(room)
-    const bids = BidUtils.nextBidsGenerator({
+    const availableBids = BidUtils.makeAvailableBids({
         startingBid: room.currentBid,
-        maxQuantity: totalDiceCount,
-        isMaputoRound: room.isMaputoRound
+        numberOfBids: 35,
+        maxBidQuantity: totalDiceCount,
+        isMaputoRound: room.isMaputoRound,
     })
     const currentPlayer = room.players[room.currentTurnPlayerIndex]
-    let candidates = []
-    for (let i = 0; i < 35; i++) {
-        let bid = bids.next().value
-        if (bid) {
-            candidates.push({
+    let candidates =
+        availableBids
+            .map((bid) => ({
                 bid: bid,
                 probability: 100 * calculateBidProbability({
                     bid: bid,
                     knownDice: currentPlayer.dice,
                     totalDiceCount: totalDiceCount,
-                    isMaputoRound: room.isMaputoRound
+                    isMaputoRound: room.isMaputoRound,
                 }),
-            })
-        } else {
-            break
-        }
-    }
-    candidates = candidates
-        .filter((candidate) => candidate.probability >= currentPlayer.aiRiskCurrentValue)
-        .sort((candidateA, candidateB) => candidateB.probability - candidateA.probability)
+            }))
+            .filter((candidate) => candidate.probability >= currentPlayer.aiRiskCurrentValue)
+            .sort((candidateA, candidateB) => candidateB.probability - candidateA.probability)
     if (candidates.length === 0) {
-        return checkBid()
+        return GameSlice.checkBid()
     } else {
-        let topBidsThreshold = candidates[0].probability - currentPlayer.aiTopBidsSimilarityThreshold
+        const topBidsThreshold = candidates[0].probability - currentPlayer.aiTopBidsSimilarityThreshold
         candidates = candidates.filter((candidate) => candidate.probability >= topBidsThreshold)
-        return placeBid(randomPick(candidates)!.bid)
+        return GameSlice.placeBid(randomPick(candidates)!.bid)
+    }
+}
+
+export function interactionInvokingAIAction(action: any, dispatchedByHuman: boolean): AppThunk {
+    return (dispatch, getState) => {
+        let state = getState()
+        const isRoundEndedBeforeAction = GameSlice.selectIsRoundEnded(state)
+
+        if (dispatchedByHuman || !isRoundEndedBeforeAction) {
+            dispatch(action)
+        }
+        
+        state = getState()
+        const room = GameSlice.selectRoom(state)
+        const isRoundEnded = GameSlice.selectIsRoundEnded(state)
+        const isAITurn = GameSlice.selectIsAITurn(state)
+        const currentPlayer = GameSlice.selectCurrentPlayer(state)
+
+        if (isAITurn && !isRoundEnded) {
+            const aiDecision = interactionInvokingAIAction(makeAIMove(room), false)
+            setTimeout(() => dispatch(aiDecision), currentPlayer.aiDelay)
+        }
     }
 }
 

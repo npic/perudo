@@ -1,10 +1,9 @@
-import GameEvent from './GameEvent'
-import GameEventType from './GameEventType'
-import * as DieFaceUtils from '../../dice/face/DieFaceUtils'
+import { GameEvent, GameEventType } from 'core/types'
+import { DieUtils } from 'core/utils'
 
 export function formatAsJSX(event: GameEvent, key: string) {
     let titleText: string = ''
-    let body: JSX.Element = (<div></div>)
+    let body: JSX.Element | undefined = undefined
     const bodyClassName = 'card-text'
 
     switch (event.type) {
@@ -13,7 +12,7 @@ export function formatAsJSX(event: GameEvent, key: string) {
             body = (
                 <div className={bodyClassName}>
                     Welcome players:
-                    <ol>
+                    <ol className="mb-0">
                         {event.playerNames.map((playerName, i) => <li key={`welcomePlayer${i}`}>{playerName}</li>)}
                     </ol>
                 </div>
@@ -26,7 +25,7 @@ export function formatAsJSX(event: GameEvent, key: string) {
             titleText = event.playerName
             body = (
                 <div className={bodyClassName}>
-                    Bids {event.bidQuantity}&nbsp;x&nbsp;<i className={DieFaceUtils.toBootstrapIconClass(event.bidDieFace)}></i>
+                    Bids {event.bidQuantity}&nbsp;x&nbsp;<i className={`bi ${DieUtils.toBootstrapIconClass(event.bidDieFace)}`}></i>
                 </div>
             )
             break
@@ -42,13 +41,13 @@ export function formatAsJSX(event: GameEvent, key: string) {
             titleText = 'Revealing Dice'
             body = (
                 <div className={bodyClassName}>
-                    <ul>
+                    <ul className="mb-0">
                         {event.playerDice.map((player, playerIndex) =>
                             <li key={`revealRound${event.roundNumber}Player${playerIndex}`}>
                                 {player.playerName}:
                                 {player.dice.map((dieFace, dieIndex) =>
                                     <i
-                                        className={`mx-1 ${DieFaceUtils.toBootstrapIconClass(dieFace)}`}
+                                        className={`bi mx-1 ${DieUtils.toBootstrapIconClass(dieFace)} ${DieUtils.matches(dieFace, event.matchingDieFace) ? 'text-success' : 'opacity-25'}`}
                                         key={`revealRound${event.roundNumber}Player${playerIndex}Die${dieIndex}`}
                                     ></i>
                                 )}
@@ -76,9 +75,9 @@ export function formatAsJSX(event: GameEvent, key: string) {
     }
 
     return (
-        <div className="card my-1" key={key}>
+        <div className="card border-start border-end-0 border-top-0 border-bottom-0 border-primary border-2 rounded-0 my-3" key={key}>
             <div className="card-body">
-                <h5 className="card-title">{titleText}</h5>
+                <h5 className={`card-title${body ? '' : ' mb-0'}`}>{titleText}</h5>
                 {body}
             </div>
         </div>
