@@ -22,10 +22,10 @@ export default function RangeSetting({ id, label, min, minLabel = '', max, maxLa
             <div className="col-12">
                 <label htmlFor={id} className="form-label">{label}</label>
             </div>
-            <div className="col-auto">
+            <div className="col-2 col-md-auto">
                 <RangeSettingLabel rangeValue={min} explanation={minLabel} side="left" />
             </div>
-            <div className="col-auto col-lg-4 flex-grow-1 flex-lg-grow-0">
+            <div className="col-8 col-md-6 flex-grow-1 flex-lg-grow-0">
                 <input
                     type="range"
                     className="form-range"
@@ -37,7 +37,7 @@ export default function RangeSetting({ id, label, min, minLabel = '', max, maxLa
                     onChange={(e) => dispatch(onChangeAction(Number(e.target.value)))}
                 ></input>
             </div>
-            <div className="col-auto">
+            <div className="col-2 col-md-auto">
                 <RangeSettingLabel rangeValue={max} explanation={maxLabel} side="right" />
             </div>
         </div>
