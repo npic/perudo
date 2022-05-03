@@ -1,4 +1,5 @@
-import { useAppSelector } from 'app/hooks'
+import { useTranslation } from 'react-i18next'
+import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { SettingsSlice } from 'app/slices'
 import { range } from 'core/utils'
 
@@ -14,20 +15,44 @@ export default function SettingsPanel() {
     const aiRiskUpperBound = useAppSelector(SettingsSlice.selectAIRiskUpperBound)
     const aiTopBidsSimilarityThreshold = useAppSelector(SettingsSlice.selectAITopBidsSimilarityThreshold)
     const aiDelay = useAppSelector(SettingsSlice.selectAIDelay)
+    const dispatch = useAppDispatch()
+    const { t, i18n } = useTranslation()
 
     return (
         <div className="row row-cols-1 gy-5">
             <div className="col">
                 <RadioButtonGroupSetting
+                    baseID="language"
+                    label={t('mainMenu.language')}
+                    options={[
+                        {
+                            label: 'English',
+                            value: 'en',
+                            disabled: false,
+                            checked: i18n.language === 'en',
+                        },
+                        {
+                            label: 'Русский',
+                            value: 'ru',
+                            disabled: false,
+                            checked: i18n.language === 'ru',
+                        },
+                    ]}
+                    onChange={(newValue: string) => dispatch(SettingsSlice.setLanguage(newValue))}
+                />
+            </div>
+            
+            <div className="col">
+                <RadioButtonGroupSetting
                     baseID="humanPlayers"
-                    label="Human Players"
+                    label={t('mainMenu.humanPlayers')}
                     options={range(7).map((i) => ({
                         label: i.toString(),
                         value: i,
                         disabled: i + aiPlayers > 6,
                         checked: i === humanPlayers,
                     }))}
-                    onChangeAction={SettingsSlice.setHumanPlayers}
+                    onChange={(newValue: number) => dispatch(SettingsSlice.setHumanPlayers(newValue))}
                 />
             </div>
 
@@ -37,9 +62,9 @@ export default function SettingsPanel() {
                         baseID="humanPlayerName"
                         fields={
                             range(humanPlayers).map((i) => ({
-                                label: `Player ${i + 1} Name`,
+                                label: t('mainMenu.humanPlayerName', { orderNo: i + 1 }),
                                 value: humanPlayerNames[i],
-                                onChangeAction: (newValue: string) => SettingsSlice.setHumanPlayerName({ playerIndex: i, playerName: newValue })
+                                onChange: (newValue: string) => dispatch(SettingsSlice.setHumanPlayerName({ playerIndex: i, playerName: newValue }))
                             }))
                         }
                     />
@@ -49,70 +74,70 @@ export default function SettingsPanel() {
             <div className="col">
                 <RadioButtonGroupSetting
                     baseID="aiPlayers"
-                    label="Computer Players"
+                    label={t('mainMenu.aiPlayers')}
                     options={range(7).map((i) => ({
                         label: i.toString(),
                         value: i,
                         disabled: i + humanPlayers > 6,
                         checked: i === aiPlayers,
                     }))}
-                    onChangeAction={SettingsSlice.setAIPlayers}
+                    onChange={(newValue: number) => dispatch(SettingsSlice.setAIPlayers(newValue))}
                 />
             </div>
 
             <div className="col">
                 <RangeSetting
                     id="aiRiskLowerBoundControl"
-                    label={`AI Risk Lower Bound: ${aiRiskLowerBound}%`}
+                    label={t('mainMenu.aiRiskLowerBound', { value: aiRiskLowerBound })}
                     min={0}
-                    minLabel="(More Risky)"
+                    minLabel={t('mainMenu.moreRisky')}
                     max={aiRiskUpperBound}
-                    maxLabel="(Less Risky)"
+                    maxLabel={t('mainMenu.lessRisky')}
                     step={5}
                     value={aiRiskLowerBound}
-                    onChangeAction={SettingsSlice.setAIRiskLowerBound}
+                    onChange={(newValue: number) => dispatch(SettingsSlice.setAIRiskLowerBound(newValue))}
                 />
             </div>
 
             <div className="col">
                 <RangeSetting
                     id="aiRiskUpperBoundControl"
-                    label={`AI Risk Upper Bound: ${aiRiskUpperBound}%`}
+                    label={t('mainMenu.aiRiskUpperBound', { value: aiRiskUpperBound })}
                     min={aiRiskLowerBound}
-                    minLabel="(More Risky)"
+                    minLabel={t('mainMenu.moreRisky')}
                     max={100}
-                    maxLabel="(Less Risky)"
+                    maxLabel={t('mainMenu.lessRisky')}
                     step={5}
                     value={aiRiskUpperBound}
-                    onChangeAction={SettingsSlice.setAIRiskUpperBound}
+                    onChange={(newValue: number) => dispatch(SettingsSlice.setAIRiskUpperBound(newValue))}
                 />
             </div>
 
             <div className="col">
                 <RangeSetting
                     id="aiTopBidsSimilarityThreshold"
-                    label={`AI Top Bids Similarity Threshold: ${aiTopBidsSimilarityThreshold}%`}
+                    label={t('mainMenu.aiTopBidsSimilarityThreshold', { value: aiTopBidsSimilarityThreshold })}
                     min={0}
-                    minLabel="(More Precise)"
+                    minLabel={t('mainMenu.morePrecise')}
                     max={100}
-                    maxLabel="(More Random)"
+                    maxLabel={t('mainMenu.moreRandom')}
                     step={5}
                     value={aiTopBidsSimilarityThreshold}
-                    onChangeAction={SettingsSlice.setAITopBidsSimilarityThreshold}
+                    onChange={(newValue: number) => dispatch(SettingsSlice.setAITopBidsSimilarityThreshold(newValue))}
                 />
             </div>
 
             <div className="col">
                 <RangeSetting
                     id="aiDelayControl"
-                    label={`AI Delay: ${aiDelay} ms`}
+                    label={t('mainMenu.aiDelay', { value: aiDelay })}
                     min={0}
-                    minLabel="(Faster)"
+                    minLabel={t('mainMenu.faster')}
                     max={3000}
-                    maxLabel="(Slower)"
+                    maxLabel={t('mainMenu.slower')}
                     step={100}
                     value={aiDelay}
-                    onChangeAction={SettingsSlice.setAIDelay}
+                    onChange={(newValue: number) => dispatch(SettingsSlice.setAIDelay(newValue))}
                 />
             </div>
         </div>

@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { RootState } from 'app/store'
+import { AppThunk, RootState } from 'app/store'
+import i18n from 'app/i18n'
 
 export interface SettingsState {
     humanPlayers: number,
@@ -13,7 +14,7 @@ export interface SettingsState {
 
 const initialState: SettingsState = {
     humanPlayers: 1,
-    humanPlayerNames: ['Nikita', 'Best Friend', 'Mobber', 'Hater', 'Skater', 'Sugarboy'],
+    humanPlayerNames: i18n.t('playerNames.human', { returnObjects: true }),
     aiPlayers: 5,
     aiRiskLowerBound: 20,
     aiRiskUpperBound: 60,
@@ -65,6 +66,22 @@ export const {
     setAITopBidsSimilarityThreshold,
     setAIDelay
 } = slice.actions
+export const setLanguage = (newLanguage: string): AppThunk => (dispatch, getState) => {
+    const state = getState()
+    const currentPlayerNames = selectHumanPlayerNames(state)
+    let defaultPlayerNames = i18n.t('playerNames.human', { returnObjects: true })
+    const needTranslation = currentPlayerNames.map((playerName, i) => playerName === defaultPlayerNames[i])
+    i18n.changeLanguage(newLanguage)
+    defaultPlayerNames = i18n.t('playerNames.human', { returnObjects: true })
+    needTranslation.forEach((needToChangeName, i) => {
+        if (needToChangeName) {
+            dispatch(setHumanPlayerName({
+                playerIndex: i,
+                playerName: defaultPlayerNames[i],
+            }))
+        }
+    })
+}
 
 export const selectAllSettings = (state: RootState) => state.settings
 export const selectHumanPlayers = (state: RootState) => state.settings.humanPlayers

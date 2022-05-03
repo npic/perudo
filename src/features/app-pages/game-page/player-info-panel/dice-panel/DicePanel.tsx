@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { DicePanelSlice } from 'app/slices'
 import { Player } from 'core/types'
@@ -5,8 +6,8 @@ import { DieUtils } from 'core/utils'
 
 export default function DicePanel({ player, disabled }: { player: Player, disabled: boolean }) {
     const areDiceShown = useAppSelector(DicePanelSlice.selectAreDiceShown)
-    
     const dispatch = useAppDispatch()
+    const { t } = useTranslation()
 
     return (
         <div className="row row-cols-auto g-3 align-items-center">
@@ -16,7 +17,7 @@ export default function DicePanel({ player, disabled }: { player: Player, disabl
                     className="btn btn-sm btn-outline-secondary"
                     disabled={disabled}
                     onClick={() => dispatch(DicePanelSlice.toggleDiceShown())}
-                >{areDiceShown ? 'Hide' : 'Show'} Dice</button>
+                >{t(areDiceShown ? 'game.buttons.hideDice' : 'game.buttons.showDice')}</button>
             </div>
             <div className="col">
                 <div className="row row-cols-auto g-3 align-items-center">

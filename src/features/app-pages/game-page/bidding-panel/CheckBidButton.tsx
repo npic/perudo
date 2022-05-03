@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useAppDispatch } from 'app/hooks'
 import { GameSlice } from 'app/slices'
 import { Bid } from 'core/types'
@@ -5,6 +6,7 @@ import { BidUtils } from 'core/utils'
 
 export default function CheckBidButton({ currentBid }: { currentBid: Bid }) {
     const dispatch = useAppDispatch()
+    const { t } = useTranslation()
 
     return (
         <button
@@ -12,6 +14,6 @@ export default function CheckBidButton({ currentBid }: { currentBid: Bid }) {
             className="btn btn-danger w-100 h-100"
             disabled={BidUtils.isNullBid(currentBid)}
             onClick={() => dispatch(GameSlice.checkBid())}
-        >Check</button>
+        >{t('game.buttons.check')}</button>
     )
 }

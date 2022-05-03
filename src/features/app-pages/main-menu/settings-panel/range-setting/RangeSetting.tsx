@@ -1,5 +1,3 @@
-import { PayloadAction } from '@reduxjs/toolkit'
-import { useAppDispatch } from 'app/hooks'
 import RangeSettingLabel from './RangeSettingLabel'
 
 interface RangeSettingProps {
@@ -11,12 +9,10 @@ interface RangeSettingProps {
     maxLabel?: string,
     step: number,
     value: number,
-    onChangeAction: (payload: number) => PayloadAction<any>,
+    onChange: (newValue: number) => any,
 }
 
-export default function RangeSetting({ id, label, min, minLabel = '', max, maxLabel = '', step, value, onChangeAction }: RangeSettingProps) {
-    const dispatch = useAppDispatch()
-
+export default function RangeSetting({ id, label, min, minLabel = '', max, maxLabel = '', step, value, onChange }: RangeSettingProps) {
     return (
         <div className="row gx-3">
             <div className="col-12">
@@ -34,7 +30,7 @@ export default function RangeSetting({ id, label, min, minLabel = '', max, maxLa
                     max={max}
                     step={step}
                     value={value}
-                    onChange={(e) => dispatch(onChangeAction(Number(e.target.value)))}
+                    onChange={(e) => onChange(Number(e.target.value))}
                 ></input>
             </div>
             <div className="col-2 col-md-auto">

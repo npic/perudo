@@ -1,6 +1,4 @@
 import React from 'react'
-import { PayloadAction } from '@reduxjs/toolkit'
-import { useAppDispatch } from 'app/hooks'
 
 interface RadioButtonGroupSettingProps<OptionValueType> {
     baseID: string,
@@ -11,12 +9,10 @@ interface RadioButtonGroupSettingProps<OptionValueType> {
         disabled: boolean,
         checked: boolean,
     }[],
-    onChangeAction: (payload: OptionValueType) => PayloadAction<any>,
+    onChange: (newValue: OptionValueType) => any,
 }
 
-export default function RadioButtonGroupSetting<OptionValueType>({ baseID, label, options, onChangeAction }: RadioButtonGroupSettingProps<OptionValueType>) {
-    const dispatch = useAppDispatch()
-    
+export default function RadioButtonGroupSetting<OptionValueType>({ baseID, label, options, onChange }: RadioButtonGroupSettingProps<OptionValueType>) {
     return (
         <div className="row row-cols-1 g-1">
             <div className="col">
@@ -35,7 +31,7 @@ export default function RadioButtonGroupSetting<OptionValueType>({ baseID, label
                                 autoComplete="off"
                                 disabled={option.disabled}
                                 checked={option.checked}
-                                onChange={() => dispatch(onChangeAction(option.value))}
+                                onChange={() => onChange(option.value)}
                             ></input>
                             <label
                                 className="btn btn-outline-primary"

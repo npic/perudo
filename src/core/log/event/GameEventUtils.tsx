@@ -1,3 +1,4 @@
+import i18n from 'app/i18n'
 import { GameEvent, GameEventType } from 'core/types'
 import { DieUtils } from 'core/utils'
 
@@ -8,10 +9,10 @@ export function formatAsJSX(event: GameEvent, key: string) {
 
     switch (event.type) {
         case GameEventType.GameStart:
-            titleText = 'Game started'
+            titleText = i18n.t('game.events.gameStart')
             body = (
                 <div className={bodyClassName}>
-                    Welcome players:
+                    {i18n.t('game.events.welcomePlayers') as string}
                     <ol className="mb-0">
                         {event.playerNames.map((playerName, i) => <li key={`welcomePlayer${i}`}>{playerName}</li>)}
                     </ol>
@@ -19,13 +20,13 @@ export function formatAsJSX(event: GameEvent, key: string) {
             )
             break
         case GameEventType.RoundStart:
-            titleText = `Round ${event.roundNumber} started ${event.isMaputo ? ' - Maputo!' : ''}`
+            titleText = i18n.t(event.isMaputo ? 'game.events.roundMaputoStart' : 'game.events.roundStart', { roundNumber: event.roundNumber })
             break
         case GameEventType.Bid:
             titleText = event.playerName
             body = (
                 <div className={bodyClassName}>
-                    Bids {event.bidQuantity}&nbsp;x&nbsp;<i className={`bi ${DieUtils.toBootstrapIconClass(event.bidDieFace)}`}></i>
+                    {i18n.t('game.events.bid') as string} {event.bidQuantity}&nbsp;x&nbsp;<i className={`bi ${DieUtils.toBootstrapIconClass(event.bidDieFace)}`}></i>
                 </div>
             )
             break
@@ -33,12 +34,12 @@ export function formatAsJSX(event: GameEvent, key: string) {
             titleText = event.playerName
             body = (
                 <div className={bodyClassName}>
-                    Check!
+                    {i18n.t('game.events.check') as string}
                 </div>
             )
             break
         case GameEventType.RevealAllDice:
-            titleText = 'Revealing Dice'
+            titleText = i18n.t('game.events.revealingDice')
             body = (
                 <div className={bodyClassName}>
                     <ul className="mb-0">
@@ -58,19 +59,19 @@ export function formatAsJSX(event: GameEvent, key: string) {
             )
             break
         case GameEventType.RoundOutcome:
-            titleText = `${event.loserName} lost the round!`
+            titleText = i18n.t('game.events.roundOutcome', { loserName: event.loserName })
             break
         case GameEventType.PlayerLost:
-            titleText = `${event.loserName} lost the game!`
+            titleText = i18n.t('game.events.gameLost', { loserName: event.loserName })
             break
         case GameEventType.RoundEnd:
-            titleText = `Round ${event.roundNumber} ended`
+            titleText = i18n.t('game.events.roundEnd', { roundNumber: event.roundNumber })
             break
         case GameEventType.PlayerWon:
-            titleText = `${event.winnerName} wins the game!`
+            titleText = i18n.t('game.events.gameWon', { winnerName: event.winnerName })
             break
         case GameEventType.GameEnd:
-            titleText = 'Game Over. Thank you for playing!'
+            titleText = i18n.t('game.events.gameOver')
             break
     }
 

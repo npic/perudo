@@ -1,28 +1,10 @@
 import { SettingsSlice } from 'app/slices'
+import i18n from 'app/i18n'
 import { GameRoom, PlayerType, PlayerBasicProperties } from 'core/types'
 import { GameRoomUtils, PlayerUtils, range, shuffle } from 'core/utils'
 
 function* playerNameGenerator() {
-    const playerNames = shuffle([
-        'MM',
-        'Mironchik',
-        'Anna Tutlberg',
-        'Henrik Tutlberg',
-        'Grisha Rotov',
-        'Shura Stone',
-        'Valery Solovey',
-        'Careless Trader',
-        'Arguyendiy',
-        'Billy Herrington',
-        'Van Darkholme',
-        'Ricardo Milos',
-        'Vladimir Khil',
-        'Crimson Fantomas',
-        'Alexandra ._. Numero',
-        'Singer-Prophet Sunboy',
-        'Zlatko Slatko',
-        'Slavko Mravko',
-    ])
+    const playerNames = shuffle(i18n.t('playerNames.ai', { returnObjects: true }))
     for (const playerName of playerNames) {
         yield playerName
     }

@@ -1,18 +1,13 @@
-import { PayloadAction } from '@reduxjs/toolkit'
-import { useAppDispatch } from 'app/hooks'
-
 interface TextInputGroupSettingProps {
     baseID: string,
     fields: {
         label: string,
         value: string,
-        onChangeAction: (payload: string) => PayloadAction<any>,
+        onChange: (newValue: string) => any,
     }[],
 }
 
 export default function TextInputGroupSetting({ baseID, fields }: TextInputGroupSettingProps) {
-    const dispatch = useAppDispatch()
-
     return (
         <div className="row row-cols-1 row-cols-md-3 row-cols-lg-6 gy-3 gy-lg-0">
             {fields.map((field, i) =>
@@ -28,7 +23,7 @@ export default function TextInputGroupSetting({ baseID, fields }: TextInputGroup
                         id={`${baseID}${i}`}
                         key={`${baseID}Input${i}`}
                         value={field.value}
-                        onChange={(e) => dispatch(field.onChangeAction(e.target.value))}
+                        onChange={(e) => field.onChange(e.target.value)}
                     ></input>
                 </div>
             )}

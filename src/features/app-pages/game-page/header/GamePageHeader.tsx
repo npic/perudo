@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useAppSelector } from 'app/hooks'
 import { GameSlice } from 'app/slices'
 
@@ -9,16 +10,17 @@ export default function GamePageHeader() {
     const isRoomEmpty = useAppSelector(GameSlice.selectIsRoomEmpty)
     const isMaputoRound = useAppSelector(GameSlice.selectIsMaputoRound)
     const roundNumber = useAppSelector(GameSlice.selectRoundNumber)
+    const { t } = useTranslation()
 
     let title = ''
     if (isGameOver) {
         if (isRoomEmpty) {
-            title = 'The room is empty'
+            title = t('game.titles.emptyRoom')
         } else {
-            title = `${currentPlayer.name} has won the game!`
+            title = t('game.titles.gameOver', { winnerName: currentPlayer.name })
         }
     } else {
-        title = `Round ${roundNumber}${isMaputoRound ? ' (Maputo)' : ''}`
+        title = t(isMaputoRound ? 'game.titles.roundMaputo' : 'game.titles.round', { roundNumber: roundNumber })
     }
     
     return (
