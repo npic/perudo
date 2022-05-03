@@ -55,9 +55,24 @@ const slice = createSlice({
 export const reducer = slice.reducer
 
 export const { startGame, stopGame, placeBid, checkBid, startNextRound } = slice.actions
-export const humanPlayerStartGame = (settings: SettingsSlice.SettingsState): AppThunk => AIUtils.interactionInvokingAIAction(startGame(settings), true)
-export const humanPlayerPlaceBid = (bid: Bid): AppThunk => AIUtils.interactionInvokingAIAction(placeBid(bid), true)
-export const humanPlayerStartNextRound = (): AppThunk => AIUtils.interactionInvokingAIAction(startNextRound(), true)
+const AIThunkCreator = (action: any): AppThunk =>
+    AIUtils.interactionInvokingAIAction({
+        action: action,
+        dispatchedByHuman: true,
+        selectors: {
+            room: selectRoom,
+            isRoundEnded: selectIsRoundEnded,
+            isAITurn: selectIsAITurn,
+            currentPlayer: selectCurrentPlayer,
+        },
+        AIDecisionActions: {
+            check: checkBid,
+            bid: placeBid,
+        }
+    })
+export const humanPlayerStartGame = (settings: SettingsSlice.SettingsState): AppThunk => AIThunkCreator(startGame(settings))
+export const humanPlayerPlaceBid = (bid: Bid): AppThunk => AIThunkCreator(placeBid(bid))
+export const humanPlayerStartNextRound = (): AppThunk => AIThunkCreator(startNextRound())
 
 export const selectRoom = (state: RootState) => state.game.room
 export const selectLog = (state: RootState) => state.game.log

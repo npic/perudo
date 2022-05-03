@@ -1,9 +1,52 @@
-import { AppThunk } from 'app/store'
-import { GameSlice } from 'app/slices'
-import { Bid, DiceSet, DieFace, GameRoom } from 'core/types'
+import { AppThunk, RootState } from 'app/store'
+import { Bid, DiceSet, DieFace, GameRoom, Player } from 'core/types'
 import { BidUtils, DieUtils, GameRoomUtils, range, randomPick, sum, product } from 'core/utils'
 
-export function makeAIMove(room: GameRoom) {
+interface AIInteractionParameters {
+    action: any
+    dispatchedByHuman: boolean
+    selectors: {
+        room: (state: RootState) => GameRoom
+        isRoundEnded: (state: RootState) => boolean
+        isAITurn: (state: RootState) => boolean
+        currentPlayer: (state: RootState) => Player
+    }
+    AIDecisionActions: AIDecisions
+}
+
+interface AIDecisions {
+    check: () => any
+    bid: (bid: Bid) => any
+}
+
+export function interactionInvokingAIAction({ action, dispatchedByHuman, selectors, AIDecisionActions }: AIInteractionParameters): AppThunk {
+    return (dispatch, getState) => {
+        let state = getState()
+        const isRoundEndedBeforeAction = selectors.isRoundEnded(state)
+
+        if (dispatchedByHuman || !isRoundEndedBeforeAction) {
+            dispatch(action)
+        }
+        
+        state = getState()
+        const room = selectors.room(state)
+        const isRoundEnded = selectors.isRoundEnded(state)
+        const isAITurn = selectors.isAITurn(state)
+        const currentPlayer = selectors.currentPlayer(state)
+
+        if (isAITurn && !isRoundEnded) {
+            const aiDecision = interactionInvokingAIAction({
+                action: makeAIMove(room, AIDecisionActions),
+                dispatchedByHuman: false,
+                selectors: selectors,
+                AIDecisionActions: AIDecisionActions,
+            })
+            setTimeout(() => dispatch(aiDecision), currentPlayer.aiDelay)
+        }
+    }
+}
+
+function makeAIMove(room: GameRoom, AIDecisionActions: AIDecisions) {
     const totalDiceCount = GameRoomUtils.getTotalDiceCount(room)
     const availableBids = BidUtils.makeAvailableBids({
         startingBid: room.currentBid,
@@ -26,33 +69,11 @@ export function makeAIMove(room: GameRoom) {
             .filter((candidate) => candidate.probability >= currentPlayer.aiRiskCurrentValue)
             .sort((candidateA, candidateB) => candidateB.probability - candidateA.probability)
     if (candidates.length === 0) {
-        return GameSlice.checkBid()
+        return AIDecisionActions.check()
     } else {
         const topBidsThreshold = candidates[0].probability - currentPlayer.aiTopBidsSimilarityThreshold
         candidates = candidates.filter((candidate) => candidate.probability >= topBidsThreshold)
-        return GameSlice.placeBid(randomPick(candidates)!.bid)
-    }
-}
-
-export function interactionInvokingAIAction(action: any, dispatchedByHuman: boolean): AppThunk {
-    return (dispatch, getState) => {
-        let state = getState()
-        const isRoundEndedBeforeAction = GameSlice.selectIsRoundEnded(state)
-
-        if (dispatchedByHuman || !isRoundEndedBeforeAction) {
-            dispatch(action)
-        }
-        
-        state = getState()
-        const room = GameSlice.selectRoom(state)
-        const isRoundEnded = GameSlice.selectIsRoundEnded(state)
-        const isAITurn = GameSlice.selectIsAITurn(state)
-        const currentPlayer = GameSlice.selectCurrentPlayer(state)
-
-        if (isAITurn && !isRoundEnded) {
-            const aiDecision = interactionInvokingAIAction(makeAIMove(room), false)
-            setTimeout(() => dispatch(aiDecision), currentPlayer.aiDelay)
-        }
+        return AIDecisionActions.bid(randomPick(candidates)!.bid)
     }
 }
 
