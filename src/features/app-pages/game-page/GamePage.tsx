@@ -31,26 +31,29 @@ export default function GamePage() {
                 </div>
             }
 
-            {!isGameOver && [
-                <div className="row row-cols-1 my-3" key="playerInfoPanel">
-                    <div className="col">
-                        <PlayerInfoPanel player={currentPlayer} isRoundEnded={isRoundEnded} />
-                    </div>
-                </div>,
-
-                <div className="row row-cols-1 my-3" key="biddingPanel">
-                    <div className="col">
-                        <BiddingPanel />
-                    </div>
-                </div>,
-
-                isRoundEnded &&
-                    <div className="row row-cols-1 my-3" key="roundOutcomeInfoPanel">
+            {!isGameOver &&
+                <>
+                    <div className="row row-cols-1 my-3">
                         <div className="col">
-                            <RoundOutcomeInfoPanel loser={loser} totalPoints={totalPoints} />
+                            <PlayerInfoPanel player={currentPlayer} isRoundEnded={isRoundEnded} />
                         </div>
-                    </div>,
-            ]}
+                    </div>
+
+                    <div className="row row-cols-1 my-3">
+                        <div className="col">
+                            <BiddingPanel />
+                        </div>
+                    </div>
+
+                    {isRoundEnded &&
+                        <div className="row row-cols-1 my-3">
+                            <div className="col">
+                                <RoundOutcomeInfoPanel loser={loser} totalPoints={totalPoints} />
+                            </div>
+                        </div>
+                    }
+                </>
+            }
         </div>
     )
 }

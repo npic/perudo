@@ -1,3 +1,4 @@
+import React from 'react'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { useAppDispatch } from 'app/hooks'
 
@@ -16,30 +17,6 @@ interface RadioButtonGroupSettingProps<OptionValueType> {
 export default function RadioButtonGroupSetting<OptionValueType>({ baseID, label, options, onChangeAction }: RadioButtonGroupSettingProps<OptionValueType>) {
     const dispatch = useAppDispatch()
     
-    const radioButtons: JSX.Element[] = []
-    options.forEach((option, i) => {
-        radioButtons.push(
-            <input
-                type="radio"
-                className="btn-check"
-                name={`${baseID}Radio`}
-                id={`${baseID}${i}`}
-                key={`${baseID}Input${i}`}
-                autoComplete="off"
-                disabled={option.disabled}
-                checked={option.checked}
-                onChange={() => dispatch(onChangeAction(option.value))}
-            ></input>
-        )
-        radioButtons.push(
-            <label
-                className="btn btn-outline-primary"
-                htmlFor={`${baseID}${i}`}
-                key={`${baseID}Label${i}`}
-            >{option.label}</label>
-        )
-    })
-
     return (
         <div className="row row-cols-1 g-1">
             <div className="col">
@@ -47,7 +24,26 @@ export default function RadioButtonGroupSetting<OptionValueType>({ baseID, label
             </div>
             <div className="col">
                 <div className="btn-group" role="group">
-                    {radioButtons}
+                    {options.map((option, i) =>
+                        <React.Fragment key={`${baseID}${i}`}>
+                            <input
+                                type="radio"
+                                className="btn-check"
+                                name={`${baseID}Radio`}
+                                id={`${baseID}${i}`}
+                                key={`${baseID}Input${i}`}
+                                autoComplete="off"
+                                disabled={option.disabled}
+                                checked={option.checked}
+                                onChange={() => dispatch(onChangeAction(option.value))}
+                            ></input>
+                            <label
+                                className="btn btn-outline-primary"
+                                htmlFor={`${baseID}${i}`}
+                                key={`${baseID}Label${i}`}
+                            >{option.label}</label>
+                        </React.Fragment>
+                    )}
                 </div>
             </div>
         </div>
