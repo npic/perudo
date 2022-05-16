@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/perudo/static/css/main.08b53292.css",
-    "main.js": "/perudo/static/js/main.36bda195.js",
+    "main.js": "/perudo/static/js/main.a8309bed.js",
     "static/media/bootstrap-icons.woff?": "/perudo/static/media/bootstrap-icons.c1d7432ee75fa194e499.woff",
     "static/media/bootstrap-icons.woff2?": "/perudo/static/media/bootstrap-icons.a13b815539b49de48d23.woff2",
     "index.html": "/perudo/index.html",
     "main.08b53292.css.map": "/perudo/static/css/main.08b53292.css.map",
-    "main.36bda195.js.map": "/perudo/static/js/main.36bda195.js.map"
+    "main.a8309bed.js.map": "/perudo/static/js/main.a8309bed.js.map"
   },
   "entrypoints": [
     "static/css/main.08b53292.css",
-    "static/js/main.36bda195.js"
+    "static/js/main.a8309bed.js"
   ]
 }
