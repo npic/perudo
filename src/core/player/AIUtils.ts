@@ -1,52 +1,15 @@
-import { AppThunk, RootState } from 'app/store'
-import { Bid, DiceSet, DieFace, GameRoom, Player } from 'core/types'
+import { ActionCreatorWithoutPayload, ActionCreatorWithPayload } from '@reduxjs/toolkit'
+import { Bid, DiceSet, DieFace, GameRoom } from 'core/types'
 import { BidUtils, DieUtils, GameRoomUtils, range, randomPick, sum, product } from 'core/utils'
 
-interface AIInteractionParameters {
-    action: any
-    dispatchedByHuman: boolean
-    selectors: {
-        room: (state: RootState) => GameRoom
-        isRoundEnded: (state: RootState) => boolean
-        isAITurn: (state: RootState) => boolean
-        currentPlayer: (state: RootState) => Player
-    }
-    AIDecisionActions: AIDecisions
-}
-
 interface AIDecisions {
-    check: () => any
-    bid: (bid: Bid) => any
+    check: ActionCreatorWithoutPayload
+    bid: ActionCreatorWithPayload<Bid>
 }
 
-export function interactionInvokingAIAction({ action, dispatchedByHuman, selectors, AIDecisionActions }: AIInteractionParameters): AppThunk {
-    return (dispatch, getState) => {
-        let state = getState()
-        const isRoundEndedBeforeAction = selectors.isRoundEnded(state)
+type AIAction = ReturnType<AIDecisions[keyof AIDecisions]>
 
-        if (dispatchedByHuman || !isRoundEndedBeforeAction) {
-            dispatch(action)
-        }
-        
-        state = getState()
-        const room = selectors.room(state)
-        const isRoundEnded = selectors.isRoundEnded(state)
-        const isAITurn = selectors.isAITurn(state)
-        const currentPlayer = selectors.currentPlayer(state)
-
-        if (isAITurn && !isRoundEnded) {
-            const aiDecision = interactionInvokingAIAction({
-                action: makeAIMove(room, AIDecisionActions),
-                dispatchedByHuman: false,
-                selectors: selectors,
-                AIDecisionActions: AIDecisionActions,
-            })
-            setTimeout(() => dispatch(aiDecision), currentPlayer.aiDelay)
-        }
-    }
-}
-
-function makeAIMove(room: GameRoom, AIDecisionActions: AIDecisions) {
+export function makeAIMove(room: GameRoom, aiDecisionActions: AIDecisions): AIAction {
     const totalDiceCount = GameRoomUtils.getTotalDiceCount(room)
     const availableBids = BidUtils.makeAvailableBids({
         startingBid: room.currentBid,
@@ -69,11 +32,11 @@ function makeAIMove(room: GameRoom, AIDecisionActions: AIDecisions) {
             .filter((candidate) => candidate.probability >= currentPlayer.aiRiskCurrentValue)
             .sort((candidateA, candidateB) => candidateB.probability - candidateA.probability)
     if (candidates.length === 0) {
-        return AIDecisionActions.check()
+        return aiDecisionActions.check()
     } else {
         const topBidsThreshold = candidates[0].probability - currentPlayer.aiTopBidsSimilarityThreshold
         candidates = candidates.filter((candidate) => candidate.probability >= topBidsThreshold)
-        return AIDecisionActions.bid(randomPick(candidates)!.bid)
+        return aiDecisionActions.bid(randomPick(candidates)!.bid)
     }
 }
 
@@ -134,3 +97,5 @@ function calculateBidProbability({ bid, knownDice, totalDiceCount, isMaputoRound
             .reduce(sum, 0.0)
     }
 }
+
+export const _testVisibility = { factorial, numberOfCombinations, exactlyNDiceMatchProbability, calculateBidProbability }

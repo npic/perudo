@@ -25,7 +25,7 @@ function castToDieFace(dieOrDieFace: Die | DieFace) {
 
 export function toNumber(die: Die | DieFace) {
     const value = castToDieFace(die)
-    return value === DieFace.Joker ? 0 : Number(value)
+    return Number(value)
 }
 
 export function toBootstrapIconClass(die: Die | DieFace) {

@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { ActionCreator, PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { AppThunk, RootState } from 'app/store'
 import { SettingsSlice } from 'app/slices'
 import { GameRoom, GameLog, Bid } from 'core/types'
@@ -55,24 +55,37 @@ const slice = createSlice({
 export const reducer = slice.reducer
 
 export const { startGame, stopGame, placeBid, checkBid, startNextRound } = slice.actions
-const AIThunkCreator = (action: any): AppThunk =>
-    AIUtils.interactionInvokingAIAction({
-        action: action,
-        dispatchedByHuman: true,
-        selectors: {
-            room: selectRoom,
-            isRoundEnded: selectIsRoundEnded,
-            isAITurn: selectIsAITurn,
-            currentPlayer: selectCurrentPlayer,
-        },
-        AIDecisionActions: {
-            check: checkBid,
-            bid: placeBid,
+
+function interactionInvokingAIAction(action: ReturnType<ActionCreator<any>>, dispatchedByHuman: boolean): AppThunk {
+    return (dispatch, getState) => {
+        let state = getState()
+        const isRoundEndedBeforeAction = selectIsRoundEnded(state)
+
+        if (dispatchedByHuman || !isRoundEndedBeforeAction) {
+            dispatch(action)
         }
-    })
-export const humanPlayerStartGame = (settings: SettingsSlice.SettingsState): AppThunk => AIThunkCreator(startGame(settings))
-export const humanPlayerPlaceBid = (bid: Bid): AppThunk => AIThunkCreator(placeBid(bid))
-export const humanPlayerStartNextRound = (): AppThunk => AIThunkCreator(startNextRound())
+        
+        state = getState()
+        const room = selectRoom(state)
+        const isRoundEnded = selectIsRoundEnded(state)
+        const isAITurn = selectIsAITurn(state)
+        const currentPlayer = selectCurrentPlayer(state)
+
+        if (isAITurn && !isRoundEnded) {
+            const aiDecision = interactionInvokingAIAction(
+                AIUtils.makeAIMove(room, {
+                    check: checkBid,
+                    bid: placeBid,
+                }),
+                false
+            )
+            setTimeout(() => dispatch(aiDecision), currentPlayer.aiDelay)
+        }
+    }
+}
+export const humanPlayerStartGame = (settings: SettingsSlice.SettingsState): AppThunk => interactionInvokingAIAction(startGame(settings), true)
+export const humanPlayerPlaceBid = (bid: Bid): AppThunk => interactionInvokingAIAction(placeBid(bid), true)
+export const humanPlayerStartNextRound = (): AppThunk => interactionInvokingAIAction(startNextRound(), true)
 
 export const selectRoom = (state: RootState) => state.game.room
 export const selectLog = (state: RootState) => state.game.log
